@@ -1,14 +1,14 @@
 <template>
     <div class="mb-3">
-        <label for="telegram-bot-token" class="form-label">Bot Token</label>
-        <HiddenInput id="telegram-bot-token" v-model="$parent.notification.telegramBotToken" :required="true" autocomplete="one-time-code"></HiddenInput>
-        <div class="form-text">
-            You can get a token from <a href="https://t.me/BotFather" target="_blank">https://t.me/BotFather</a>.
-        </div>
+        <label for="telegram-bot-token" class="form-label">{{ $t("Bot Token") }}</label>
+        <HiddenInput id="telegram-bot-token" v-model="$parent.notification.telegramBotToken" :required="true" autocomplete="new-password"></HiddenInput>
+        <i18n-t tag="div" keypath="wayToGetTelegramToken" class="form-text">
+            <a href="https://t.me/BotFather" target="_blank">https://t.me/BotFather</a>
+        </i18n-t>
     </div>
 
     <div class="mb-3">
-        <label for="telegram-chat-id" class="form-label">Chat ID</label>
+        <label for="telegram-chat-id" class="form-label">{{ $t("Chat ID") }}</label>
 
         <div class="input-group mb-3">
             <input id="telegram-chat-id" v-model="$parent.notification.telegramChatID" type="text" class="form-control" required>
@@ -18,21 +18,39 @@
         </div>
 
         <div class="form-text">
-            Support Direct Chat / Group / Channel's Chat ID
+            {{ $t("supportTelegramChatID") }}
 
             <p style="margin-top: 8px;">
-                You can get your chat id by sending message to the bot and go to this url to view the chat_id:
+                {{ $t("wayToGetTelegramChatID") }}
             </p>
 
             <p style="margin-top: 8px;">
-                <template v-if="$parent.notification.telegramBotToken">
-                    <a :href="telegramGetUpdatesURL" target="_blank" style="word-break: break-word;">{{ telegramGetUpdatesURL }}</a>
-                </template>
-
-                <template v-else>
-                    {{ telegramGetUpdatesURL }}
-                </template>
+                <a :href="telegramGetUpdatesURL('withToken')" target="_blank" style="word-break: break-word;">{{ telegramGetUpdatesURL("masked") }}</a>
             </p>
+        </div>
+
+        <label for="message_thread_id" class="form-label">{{ $t("telegramMessageThreadID") }}</label>
+        <input id="message_thread_id" v-model="$parent.notification.telegramMessageThreadID" type="text" class="form-control">
+        <p class="form-text">{{ $t("telegramMessageThreadIDDescription") }}</p>
+
+        <div class="form-check form-switch">
+            <input v-model="$parent.notification.telegramSendSilently" class="form-check-input" type="checkbox">
+            <label class="form-check-label">{{ $t("telegramSendSilently") }}</label>
+        </div>
+
+        <div class="form-text">
+            {{ $t("telegramSendSilentlyDescription") }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <div class="form-check form-switch">
+            <input v-model="$parent.notification.telegramProtectContent" class="form-check-input" type="checkbox">
+            <label class="form-check-label">{{ $t("telegramProtectContent") }}</label>
+        </div>
+
+        <div class="form-text">
+            {{ $t("telegramProtectContentDescription") }}
         </div>
     </div>
 </template>
@@ -40,49 +58,60 @@
 <script>
 import HiddenInput from "../HiddenInput.vue";
 import axios from "axios";
-import { useToast } from "vue-toastification"
-const toast = useToast();
 
 export default {
     components: {
         HiddenInput,
     },
-    computed: {
-        telegramGetUpdatesURL() {
-            let token = "<YOUR BOT TOKEN HERE>"
+    methods: {
+        /**
+         * Get the URL for telegram updates
+         * @param {string} mode Should the token be masked?
+         * @returns {string} formatted URL
+         */
+        telegramGetUpdatesURL(mode = "masked") {
+            let token = `<${this.$t("YOUR BOT TOKEN HERE")}>`;
 
             if (this.$parent.notification.telegramBotToken) {
-                token = this.$parent.notification.telegramBotToken;
+                if (mode === "withToken") {
+                    token = this.$parent.notification.telegramBotToken;
+                } else if (mode === "masked") {
+                    token = "*".repeat(this.$parent.notification.telegramBotToken.length);
+                }
             }
 
             return `https://api.telegram.org/bot${token}/getUpdates`;
         },
-    },
-    methods: {
+
+        /**
+         * Get the telegram chat ID
+         * @returns {Promise<void>}
+         * @throws The chat ID could not be found
+         */
         async autoGetTelegramChatID() {
             try {
-                let res = await axios.get(this.telegramGetUpdatesURL)
+                let res = await axios.get(this.telegramGetUpdatesURL("withToken"));
 
                 if (res.data.result.length >= 1) {
-                    let update = res.data.result[res.data.result.length - 1]
+                    let update = res.data.result[res.data.result.length - 1];
 
                     if (update.channel_post) {
-                        this.notification.telegramChatID = update.channel_post.chat.id;
+                        this.$parent.notification.telegramChatID = update.channel_post.chat.id;
                     } else if (update.message) {
-                        this.notification.telegramChatID = update.message.chat.id;
+                        this.$parent.notification.telegramChatID = update.message.chat.id;
                     } else {
-                        throw new Error("Chat ID is not found, please send a message to this bot first")
+                        throw new Error(this.$t("chatIDNotFound"));
                     }
 
                 } else {
-                    throw new Error("Chat ID is not found, please send a message to this bot first")
+                    throw new Error(this.$t("chatIDNotFound"));
                 }
 
             } catch (error) {
-                toast.error(error.message)
+                this.$root.toastError(error.message);
             }
 
         },
     }
-}
+};
 </script>

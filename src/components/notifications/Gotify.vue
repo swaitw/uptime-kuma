@@ -1,17 +1,15 @@
 <template>
     <div class="mb-3">
-        <label for="gotify-application-token" class="form-label">Application Token</label>
-        <HiddenInput id="gotify-application-token" v-model="$parent.notification.gotifyapplicationToken" :required="true" autocomplete="one-time-code"></HiddenInput>
+        <label for="gotify-application-token" class="form-label">{{ $t("Application Token") }}</label>
+        <HiddenInput id="gotify-application-token" v-model="$parent.notification.gotifyapplicationToken" :required="true" autocomplete="new-password"></HiddenInput>
     </div>
     <div class="mb-3">
-        <label for="gotify-server-url" class="form-label">Server URL</label>
-        <div class="input-group mb-3">
-            <input id="gotify-server-url" v-model="$parent.notification.gotifyserverurl" type="text" class="form-control" required>
-        </div>
+        <label for="gotify-server-url" class="form-label">{{ $t("Server URL") }}</label>
+        <input id="gotify-server-url" v-model="$parent.notification.gotifyserverurl" type="text" class="form-control" required>
     </div>
 
     <div class="mb-3">
-        <label for="gotify-priority" class="form-label">Priority</label>
+        <label for="gotify-priority" class="form-label">{{ $t("Priority") }}</label>
         <input id="gotify-priority" v-model="$parent.notification.gotifyPriority" type="number" class="form-control" required min="0" max="10" step="1">
     </div>
 </template>
@@ -28,5 +26,5 @@ export default {
             this.$parent.notification.gotifyPriority = 8;
         }
     },
-}
+};
 </script>

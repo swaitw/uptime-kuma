@@ -1,6 +1,12 @@
 @import "vars.scss";
 @import "node_modules/vue-multiselect/dist/vue-multiselect";
 
+.multiselect {
+    .dark & {
+        color: $dark-font-color;
+    }
+}
+
 .multiselect__tags {
     border-radius: 1.5rem;
     border: 1px solid #ced4da;
@@ -14,14 +20,16 @@
 
 .multiselect__option--highlight {
     background: $primary !important;
+    color: $dark-font-color2 !important;
 }
 
 .multiselect__option--highlight::after {
     background: $primary !important;
+    color: $dark-font-color2 !important;
 }
 
 .multiselect__tag {
-    border-radius: 50rem;
+    border-radius: $border-radius;
     margin-bottom: 0;
     padding: 6px 26px 6px 10px;
     background: $primary !important;
@@ -61,6 +69,7 @@
     .multiselect__content-wrapper {
         background-color: $dark-bg2;
         border-color: $dark-border-color;
+        z-index: 150;
     }
 
     .multiselect--above .multiselect__content-wrapper {

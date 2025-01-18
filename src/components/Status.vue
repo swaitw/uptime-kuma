@@ -5,24 +5,32 @@
 <script>
 export default {
     props: {
-        status: Number,
+        /** Current status of monitor */
+        status: {
+            type: Number,
+            default: 0,
+        }
     },
 
     computed: {
         color() {
             if (this.status === 0) {
-                return "danger"
+                return "danger";
             }
 
             if (this.status === 1) {
-                return "primary"
+                return "primary";
             }
 
             if (this.status === 2) {
-                return "warning"
+                return "warning";
             }
 
-            return "secondary"
+            if (this.status === 3) {
+                return "maintenance";
+            }
+
+            return "secondary";
         },
 
         text() {
@@ -38,14 +46,18 @@ export default {
                 return this.$t("Pending");
             }
 
+            if (this.status === 3) {
+                return this.$t("statusMaintenance");
+            }
+
             return this.$t("Unknown");
         },
     },
-}
+};
 </script>
 
 <style scoped>
     span {
-        width: 64px;
+        min-width: 64px;
     }
 </style>

@@ -1,7 +1,6 @@
 /.idea
-/dist
 /node_modules
-/data
+/data*
 /out
 /test
 /kubernetes
@@ -27,6 +26,16 @@ CNAME
 install.sh
 SECURITY.md
 tsconfig.json
+.env
+/tmp
+/ecosystem.config.js
+/extra/healthcheck.exe
+/extra/healthcheck
+/extra/exe-builder
+/extra/uptime-kuma-push
+
+# Comment the following line if you want to rebuild the healthcheck binary
+/extra/healthcheck-armv7
 
 
 ### .gitignore content (commented rules are duplicated)

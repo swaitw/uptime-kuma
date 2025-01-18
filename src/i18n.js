@@ -1,55 +1,88 @@
-import { createI18n } from "vue-i18n";
-import bgBG from "./languages/bg-BG";
-import daDK from "./languages/da-DK";
-import deDE from "./languages/de-DE";
-import en from "./languages/en";
-import esEs from "./languages/es-ES";
-import etEE from "./languages/et-EE";
-import fa from "./languages/fa";
-import frFR from "./languages/fr-FR";
-import hu from "./languages/hu";
-import itIT from "./languages/it-IT";
-import ja from "./languages/ja";
-import koKR from "./languages/ko-KR";
-import nlNL from "./languages/nl-NL";
-import pl from "./languages/pl";
-import ptBR from "./languages/pt-BR";
-import ruRU from "./languages/ru-RU";
-import sr from "./languages/sr";
-import srLatn from "./languages/sr-latn";
-import svSE from "./languages/sv-SE";
-import trTR from "./languages/tr-TR";
-import zhCN from "./languages/zh-CN";
-import zhHK from "./languages/zh-HK";
+import { createI18n } from "vue-i18n/dist/vue-i18n.esm-browser.prod.js";
+import en from "./lang/en.json";
 
 const languageList = {
-    en,
-    "zh-HK": zhHK,
-    "bg-BG": bgBG,
-    "de-DE": deDE,
-    "nl-NL": nlNL,
-    "es-ES": esEs,
-    "fa": fa,
-    "pt-BR": ptBR,
-    "fr-FR": frFR,
-    "hu": hu,
-    "it-IT": itIT,
-    "ja": ja,
-    "da-DK": daDK,
-    "sr": sr,
-    "sr-latn": srLatn,
-    "sv-SE": svSE,
-    "tr-TR": trTR,
-    "ko-KR": koKR,
-    "ru-RU": ruRU,
-    "zh-CN": zhCN,
-    "pl": pl,
-    "et-EE": etEE,
+    "ar-SY": "العربية",
+    "cs-CZ": "Čeština",
+    "zh-HK": "繁體中文 (香港)",
+    "bg-BG": "Български",
+    "be": "Беларуская",
+    "de-DE": "Deutsch (Deutschland)",
+    "de-CH": "Deutsch (Schweiz)",
+    "nl-NL": "Nederlands",
+    "nb-NO": "Norsk",
+    "es-ES": "Español",
+    "eu": "Euskara",
+    "fa": "Farsi",
+    "pt-PT": "Português (Portugal)",
+    "pt-BR": "Português (Brasileiro)",
+    "fi": "Suomi",
+    "fr-FR": "Français (France)",
+    "he-IL": "עברית",
+    "hu": "Magyar",
+    "hr-HR": "Hrvatski",
+    "it-IT": "Italiano (Italian)",
+    "id-ID": "Bahasa Indonesia (Indonesian)",
+    "ja": "日本語",
+    "da-DK": "Danish (Danmark)",
+    "sr": "Српски",
+    "sl-SI": "Slovenščina",
+    "sr-latn": "Srpski",
+    "sv-SE": "Svenska",
+    "tr-TR": "Türkçe",
+    "ko-KR": "한국어",
+    "ru-RU": "Русский",
+    "zh-CN": "简体中文",
+    "pl": "Polski",
+    "et-EE": "eesti",
+    "vi-VN": "Tiếng Việt",
+    "zh-TW": "繁體中文 (台灣)",
+    "uk-UA": "Українська",
+    "th-TH": "ไทย",
+    "el-GR": "Ελληνικά",
+    "yue": "繁體中文 (廣東話 / 粵語)",
+    "ro": "Limba română",
+    "ur": "Urdu",
+    "ge": "ქართული",
+    "uz": "O'zbek tili",
+    "ga": "Gaeilge",
 };
 
-const rtlLangs = ["fa"];
+let messages = {
+    en,
+};
 
-export const currentLocale = () => localStorage.locale || "en";
+for (let lang in languageList) {
+    messages[lang] = {
+        languageName: languageList[lang]
+    };
+}
+
+const rtlLangs = [ "he-IL", "fa", "ar-SY", "ur" ];
+
+/**
+ * Find the best matching locale to display
+ * If no locale can be matched, the default is "en"
+ * @returns {string} the locale that should be displayed
+ */
+export function currentLocale() {
+    for (const locale of [ localStorage.locale, navigator.language, ...navigator.languages ]) {
+        // localstorage might not have a value or there might not be a language in `navigator.language`
+        if (!locale) {
+            continue;
+        }
+        if (locale in messages) {
+            return locale;
+        }
+        // some locales are further specified such as "en-US".
+        // If we only have a generic locale for this, we can use it too
+        const genericLocale = locale.split("-")[0];
+        if (genericLocale in messages) {
+            return genericLocale;
+        }
+    }
+    return "en";
+}
 
 export const localeDirection = () => {
     return rtlLangs.includes(currentLocale()) ? "rtl" : "ltr";
@@ -60,5 +93,5 @@ export const i18n = createI18n({
     fallbackLocale: "en",
     silentFallbackWarn: true,
     silentTranslationWarn: true,
-    messages: languageList,
+    messages: messages,
 });
